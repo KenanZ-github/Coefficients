@@ -50,4 +50,8 @@ public class UserController {
         userRepository.deleteById(id);
         return "User with id "+id+" has been deleted success.";
     }
-}   
+    @GetMapping("/users/search")
+    public List<User> searchUsersByName(@RequestParam("name") String name) {
+        return userRepository.findByNameContainingIgnoreCase(name);
+    }
+}
