@@ -7,12 +7,10 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    List<User> findByImePrezimeContainingIgnoreCase(String imePrezime);
+        List<User> findByImePrezimeLike(String imePrezime);
+        List<User> findByOdsjekLike(String odsjek);
+        List<User> findByImePrezimeLikeAndOdsjekLike(String imePrezime, String odsjek);
+    }
 
-    List<User> findByOdsjekContainingIgnoreCase(String odsjek);
-    List<User> findByImePrezimeContainingIgnoreCaseAndOdsjekContainingIgnoreCase(String imePrezime, String odsjek);
-
-
-}
 
 
