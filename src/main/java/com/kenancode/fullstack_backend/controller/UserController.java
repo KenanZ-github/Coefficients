@@ -34,15 +34,16 @@ public class UserController {
     private final String uploadDir = "uploads";
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestParam("slikaPath") MultipartFile slikaPath, 
-                                      @RequestParam Map<String, String> userData) {
+    public ResponseEntity<?> createUser(
+            @RequestParam(value = "slikaPath", required = false) MultipartFile slikaPath,
+            @RequestParam Map<String, String> userData) {
         try {
-            System.out.println("Received user data: " + userData);
-            
-            // Handle file upload
-            String fileName = handleFileUpload(slikaPath);
-            System.out.println("File uploaded successfully: " + fileName);
-            
+            // Handle file upload (ako postoji)
+            String fileName = null;
+            if (slikaPath != null && !slikaPath.isEmpty()) {
+                fileName = handleFileUpload(slikaPath);
+            }
+
             // Create User with basic information only
             User user = new User();
             user.setImePrezime(userData.get("imePrezime"));
@@ -50,13 +51,12 @@ public class UserController {
             user.setPozicija(userData.get("pozicija"));
             user.setRadnoVrijeme(userData.get("radnoVrijeme"));
             user.setAkademskoZvanje(userData.get("akademskoZvanje"));
-            user.setSlikaPath(fileName);
-            
+            user.setSlikaPath(fileName); // može biti null
+
             // Save user
             User savedUser = userRepository.save(user);
-            System.out.println("User saved successfully with ID: " + savedUser.getId());
 
-            // If you need to create an initial Academic record, you can do it here
+            // Ako treba, kreirajte i Academic record
             if (userData.containsKey("academicYear")) {
                 Academic academic = new Academic();
                 academic.setUser(savedUser);
@@ -64,7 +64,7 @@ public class UserController {
                 // Set other Academic fields as needed
                 academicRepository.save(academic);
             }
-            
+
             return ResponseEntity.ok(savedUser);
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,7 +82,7 @@ public class UserController {
 
         // Generate unique filename
         String originalFilename = file.getOriginalFilename();
-        String fileExtension = originalFilename.Osubstring(originalFilename.lastIndexOf("."));
+        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
         String newFilename = UUID.randomUUID().toString() + fileExtension;
 
         // Save file
